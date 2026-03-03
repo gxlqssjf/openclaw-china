@@ -28,11 +28,53 @@ import {
 /**
  * Moltbot 插件 API 接口
  */
+type HttpRouteMatch = "exact" | "prefix";
+type HttpRouteAuth = "gateway" | "plugin";
+
+type HttpRouteParams = {
+  path: string;
+  auth: HttpRouteAuth;
+  match?: HttpRouteMatch;
+  handler: (req: IncomingMessage, res: ServerResponse) => Promise<boolean> | boolean;
+};
+
+type WecomAppRouteConfig = {
+  webhookPath?: string;
+  accounts?: Record<
+    string,
+    {
+      webhookPath?: string;
+    }
+  >;
+};
+
 export interface MoltbotPluginApi {
   registerChannel: (opts: { plugin: unknown }) => void;
   registerHttpHandler?: (handler: (req: IncomingMessage, res: ServerResponse) => Promise<boolean> | boolean) => void;
+  registerHttpRoute?: (params: HttpRouteParams) => void;
+  config?: {
+    channels?: {
+      "wecom-app"?: WecomAppRouteConfig;
+    };
+  };
   runtime?: unknown;
   [key: string]: unknown;
+}
+
+function normalizeRoutePath(path: string | undefined, fallback: string): string {
+  const trimmed = path?.trim() ?? "";
+  const candidate = trimmed || fallback;
+  return candidate.startsWith("/") ? candidate : `/${candidate}`;
+}
+
+function collectWecomAppRoutePaths(config: WecomAppRouteConfig | undefined): string[] {
+  const routes = new Set<string>([normalizeRoutePath(config?.webhookPath, "/wecom-app")]);
+  for (const accountConfig of Object.values(config?.accounts ?? {})) {
+    const customPath = accountConfig?.webhookPath?.trim();
+    if (!customPath) continue;
+    routes.add(normalizeRoutePath(customPath, "/wecom-app"));
+  }
+  return [...routes];
 }
 
 // 导出 ChannelPlugin
@@ -92,7 +134,17 @@ const plugin = {
 
     api.registerChannel({ plugin: wecomAppPlugin });
 
-    if (api.registerHttpHandler) {
+    if (api.registerHttpRoute) {
+      for (const path of collectWecomAppRoutePaths(api.config?.channels?.["wecom-app"])) {
+        api.registerHttpRoute({
+          path,
+          auth: "plugin",
+          match: "prefix",
+          handler: handleWecomAppWebhookRequest,
+        });
+      }
+    } else if (api.registerHttpHandler) {
+      // Backward compatibility for older OpenClaw core
       api.registerHttpHandler(handleWecomAppWebhookRequest);
     }
   },
