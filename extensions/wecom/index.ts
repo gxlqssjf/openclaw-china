@@ -28,19 +28,43 @@ type HttpRouteParams = {
   handler: (req: IncomingMessage, res: ServerResponse) => Promise<boolean> | boolean;
 };
 
+type WecomRouteConfig = {
+  webhookPath?: string;
+  accounts?: Record<
+    string,
+    {
+      webhookPath?: string;
+    }
+  >;
+};
+
 export interface MoltbotPluginApi {
   registerChannel: (opts: { plugin: unknown }) => void;
   registerHttpHandler?: (handler: (req: IncomingMessage, res: ServerResponse) => Promise<boolean> | boolean) => void;
   registerHttpRoute?: (params: HttpRouteParams) => void;
   config?: {
     channels?: {
-      wecom?: {
-        webhookPath?: string;
-      };
+      wecom?: WecomRouteConfig;
     };
   };
   runtime?: unknown;
   [key: string]: unknown;
+}
+
+function normalizeRoutePath(path: string | undefined, fallback: string): string {
+  const trimmed = path?.trim() ?? "";
+  const candidate = trimmed || fallback;
+  return candidate.startsWith("/") ? candidate : `/${candidate}`;
+}
+
+function collectWecomRoutePaths(config: WecomRouteConfig | undefined): string[] {
+  const routes = new Set<string>([normalizeRoutePath(config?.webhookPath, "/wecom"), "/wecom-media"]);
+  for (const accountConfig of Object.values(config?.accounts ?? {})) {
+    const customPath = accountConfig?.webhookPath?.trim();
+    if (!customPath) continue;
+    routes.add(normalizeRoutePath(customPath, "/wecom"));
+  }
+  return [...routes];
 }
 
 // 导出 ChannelPlugin
@@ -72,19 +96,14 @@ const plugin = {
     api.registerChannel({ plugin: wecomPlugin });
 
     if (api.registerHttpRoute) {
-      const webhookPath = (api.config?.channels?.wecom?.webhookPath ?? "/wecom").trim() || "/wecom";
-      api.registerHttpRoute({
-        path: webhookPath,
-        auth: "plugin",
-        match: "prefix",
-        handler: handleWecomWebhookRequest,
-      });
-      api.registerHttpRoute({
-        path: "/wecom-media",
-        auth: "plugin",
-        match: "prefix",
-        handler: handleWecomWebhookRequest,
-      });
+      for (const path of collectWecomRoutePaths(api.config?.channels?.wecom)) {
+        api.registerHttpRoute({
+          path,
+          auth: "plugin",
+          match: "prefix",
+          handler: handleWecomWebhookRequest,
+        });
+      }
     } else if (api.registerHttpHandler) {
       // Backward compatibility for older OpenClaw core
       api.registerHttpHandler(handleWecomWebhookRequest);
