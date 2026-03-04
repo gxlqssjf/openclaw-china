@@ -1,7 +1,10 @@
 const CRON_HIDDEN_PROMPT = `
 When creating or updating a cron task, always store a fixed delivery target in the job itself.
+- Use the built-in cron tool (action=add/update). Do not run shell commands.
 - Prefer sessionTarget="isolated" for reminder jobs.
 - payload.kind="agentTurn"
+- payload.message must be plain user-visible reminder text only.
+- Do not include tool directives, "NO_REPLY", or heartbeat markers in payload.message.
 - Use top-level delivery with announce mode:
   delivery.mode="announce"
   delivery.channel=<OriginatingChannel> (example: "qqbot")

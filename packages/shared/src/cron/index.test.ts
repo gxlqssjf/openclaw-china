@@ -15,6 +15,8 @@ describe("cron hidden prompt", () => {
     expect(next).not.toBe(text);
     expect(next).toContain('sessionTarget="isolated"');
     expect(next).toContain('payload.kind="agentTurn"');
+    expect(next).toContain("Use the built-in cron tool (action=add/update)");
+    expect(next).toContain("payload.message must be plain user-visible reminder text only");
     expect(next).toContain('delivery.mode="announce"');
     expect(next).toContain("delivery.channel=<OriginatingChannel>");
     expect(next).toContain("delivery.to=<OriginatingTo>");
@@ -46,7 +48,7 @@ describe("cron hidden prompt", () => {
   });
 
   it("applies to context command body only when needed", () => {
-    const ctx = { Body: "每天 18:00 提醒我下班喝水" };
+    const ctx: { Body?: string; CommandBody?: string } = { Body: "每天 18:00 提醒我下班喝水" };
     const changed = applyCronHiddenPromptToContext(ctx);
 
     expect(changed).toBe(true);
