@@ -3,22 +3,34 @@
 <p align="center">
   <strong>面向中国 IM 平台的 OpenClaw 扩展插件集合</strong>
 </p>
-
 <p align="center">
   <a href="#快速开始">快速开始</a> •
   <a href="#总体架构">总体架构</a> •
   <a href="#功能支持">功能支持</a> •
   <a href="#更新日志">更新日志</a> •
   <a href="#演示">演示</a> •
+  <a href="#-支持我">💗 支持我</a> •
   <a href="#加入交流群"><strong>加入交流群</strong></a>
 </p>
 <p align="center">
   <strong>⭐ 如果这个项目对你有帮助，请给我们一个Star！⭐</strong><br>
   <em>您的支持是我们持续改进的动力</em>
 </p>
-<p align="center">
-  <strong>🤖 推荐：<a href="https://github.com/BytePioneer-AI/clawmate">ClawMate</a></strong> — 为 OpenClaw 添加有温度的角色伴侣
-</p>
+
+<table align="center">
+  <tr>
+    <td width="220" align="center" valign="middle">
+      <strong>💗 支持作者</strong><br />
+      <a href="https://openclaw-link.top/">GPT 拼车服务站</a>
+    </td>
+    <td valign="top">
+      OpenClaw 中 ChatGPT 模型随心用：无需梯子、国内免翻访问，支持 OpenAI 最新所有模型。<br />
+      地址：<a href="https://openclaw-link.top/">https://openclaw-link.top/</a>
+    </td>
+  </tr>
+</table>
+
+
 <table align="center">
   <thead>
     <tr>
@@ -550,6 +562,27 @@ flowchart TD
 ```
 
 </details>
+
+## 💗 支持我
+
+这是一个公益项目，感谢支持。本项目由我利用休息时间开发维护，未来会持续更新与支持。当前不接受捐助；如希望支持作者，可以去小店支持一下：<a href="https://openclaw-link.top/">https://openclaw-link.top/</a>
+
+<table>
+  <tr>
+    <td width="220" align="center" valign="middle">
+      <strong>作者项目</strong><br />
+      <a href="https://openclaw-link.top/">GPT 拼车服务站</a>
+    </td>
+    <td valign="top">
+      在 OpenClaw 中实现 ChatGPT 模型随心用。<br />
+      ✅ 无需梯子，国内免翻访问<br />
+      ✅ 后台大量官方账号池，随心使用<br />
+      ✅ 支持 OpenAI 最新所有模型<br />
+      地址：<a href="https://openclaw-link.top/">https://openclaw-link.top/</a>
+    </td>
+  </tr>
+</table>
+
 
 ## 加入交流群
 
